@@ -56,7 +56,10 @@ const config: Config = {
         serif: ["var(--font-noto-serif-jp)", "serif"],
         display: ["var(--font-kudryashev-display)", "sans-serif"],
         "kudryashev-display": ["var(--font-kudryashev-display)", "sans-serif"],
+        "kudryashev-extra-contrast": ["var(--font-kudryashev-display)", "sans-serif"],
         "neue-haas-grotesk": ["var(--font-neue-haas-grotesk)", "sans-serif"],
+        "neue-haas-thin": ["var(--font-neue-haas-grotesk)", "sans-serif"],
+        "neue-haas-medium": ["var(--font-neue-haas-grotesk)", "sans-serif"],
         "cofo-raffine": ["cofo-raffine", "serif"],
       },
       borderRadius: {

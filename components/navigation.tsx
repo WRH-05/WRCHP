@@ -15,6 +15,7 @@ const sections = [
 
 export function Navigation() {
   const [activeSection, setActiveSection] = useState("")
+  const [isScrolled, setIsScrolled] = useState(false)
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -36,8 +37,26 @@ export function Navigation() {
     return () => observer.disconnect()
   }, [])
 
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY
+      // Show navigation after scrolling 50% of viewport height
+      setIsScrolled(scrollPosition > window.innerHeight * 0.5)
+    }
+
+    window.addEventListener("scroll", handleScroll)
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
+
   return (
-    <nav className="fixed left-8 top-1/2 -translate-y-1/2 z-50 hidden lg:block">
+    <nav 
+      className={cn(
+        "fixed left-8 top-1/2 -translate-y-1/2 z-50 hidden lg:block transition-all duration-500 ease-out",
+        isScrolled 
+          ? "opacity-100 translate-x-0" 
+          : "opacity-0 -translate-x-8 pointer-events-none"
+      )}
+    >
       <div className="flex flex-col gap-8">
         {sections.map(({ id, label }) => (
           <a
