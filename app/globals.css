@@ -1,0 +1,307 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  /* Updated to black and white color scheme with red accent */
+  --background: oklch(0.98 0 0); /* Pure white background */
+  --foreground: oklch(0.09 0 0); /* Deep black text */
+  --card: oklch(0.96 0 0); /* Light gray card background */
+  --card-foreground: oklch(0.09 0 0);
+  --popover: oklch(0.98 0 0);
+  --popover-foreground: oklch(0.09 0 0);
+  --primary: oklch(0.55 0.22 25); /* Red accent color */
+  --primary-foreground: oklch(0.98 0 0);
+  --secondary: oklch(0.94 0 0);
+  --secondary-foreground: oklch(0.09 0 0);
+  --muted: oklch(0.92 0 0);
+  --muted-foreground: oklch(0.45 0 0);
+  --accent: oklch(0.55 0.22 25); /* Red accent */
+  --accent-foreground: oklch(0.98 0 0);
+  --destructive: oklch(0.55 0.22 25);
+  --destructive-foreground: oklch(0.98 0 0);
+  --border: oklch(0.89 0 0);
+  --input: oklch(0.94 0 0);
+  --ring: oklch(0.55 0.22 25);
+  --chart-1: oklch(0.55 0.22 25);
+  --chart-2: oklch(0.45 0 0);
+  --chart-3: oklch(0.35 0 0);
+  --chart-4: oklch(0.25 0 0);
+  --chart-5: oklch(0.15 0 0);
+  --radius: 0.25rem; /* Sharper corners for minimalist look */
+  --sidebar: oklch(0.96 0 0);
+  --sidebar-foreground: oklch(0.09 0 0);
+  --sidebar-primary: oklch(0.55 0.22 25);
+  --sidebar-primary-foreground: oklch(0.98 0 0);
+  --sidebar-accent: oklch(0.94 0 0);
+  --sidebar-accent-foreground: oklch(0.09 0 0);
+  --sidebar-border: oklch(0.89 0 0);
+  --sidebar-ring: oklch(0.55 0.22 25);
+}
+
+.dark {
+  /* Dark mode with inverted black and white scheme */
+  --background: oklch(0.09 0 0); /* Deep black background */
+  --foreground: oklch(0.98 0 0); /* Pure white text */
+  --card: oklch(0.12 0 0);
+  --card-foreground: oklch(0.98 0 0);
+  --popover: oklch(0.09 0 0);
+  --popover-foreground: oklch(0.98 0 0);
+  --primary: oklch(0.65 0.22 25); /* Brighter red for dark mode */
+  --primary-foreground: oklch(0.09 0 0);
+  --secondary: oklch(0.15 0 0);
+  --secondary-foreground: oklch(0.98 0 0);
+  --muted: oklch(0.18 0 0);
+  --muted-foreground: oklch(0.65 0 0);
+  --accent: oklch(0.65 0.22 25);
+  --accent-foreground: oklch(0.09 0 0);
+  --destructive: oklch(0.65 0.22 25);
+  --destructive-foreground: oklch(0.98 0 0);
+  --border: oklch(0.18 0 0);
+  --input: oklch(0.15 0 0);
+  --ring: oklch(0.65 0.22 25);
+  --chart-1: oklch(0.65 0.22 25);
+  --chart-2: oklch(0.75 0 0);
+  --chart-3: oklch(0.65 0 0);
+  --chart-4: oklch(0.55 0 0);
+  --chart-5: oklch(0.45 0 0);
+  --sidebar: oklch(0.12 0 0);
+  --sidebar-foreground: oklch(0.98 0 0);
+  --sidebar-primary: oklch(0.65 0.22 25);
+  --sidebar-primary-foreground: oklch(0.09 0 0);
+  --sidebar-accent: oklch(0.15 0 0);
+  --sidebar-accent-foreground: oklch(0.98 0 0);
+  --sidebar-border: oklch(0.18 0 0);
+  --sidebar-ring: oklch(0.65 0.22 25);
+}
+
+/* Added multiple font families for different sections */
+@theme inline {
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-geist-mono);
+  --font-serif: var(--font-noto-serif-jp);
+  --font-display: var(--font-kudryashev-display);
+  --font-kudryashev-display: var(--font-kudryashev-display);
+  --font-neue-haas-grotesk: var(--font-neue-haas-grotesk);
+  --font-cofo-raffine: "cofo-raffine", serif;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 2px);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 2px);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+
+  /* Enhanced smooth scrolling and minimalist scrollbar */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  ::-webkit-scrollbar {
+    width: 2px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--muted-foreground);
+    border-radius: 1px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--primary);
+  }
+
+  /* Typography classes for different sections */
+  .font-display {
+    font-family: var(--font-kudryashev-display);
+  }
+
+  .font-serif-jp {
+    font-family: var(--font-serif);
+  }
+
+  /* New premium font utility classes */
+  .font-kudryashev-display {
+    font-family: var(--font-kudryashev-display);
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  .font-kudryashev-extra-contrast {
+    font-family: var(--font-kudryashev-display);
+    font-weight: 700;
+    font-style: normal;
+  }
+
+  .font-neue-haas-grotesk {
+    font-family: var(--font-neue-haas-grotesk);
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  .font-neue-haas-thin {
+    font-family: var(--font-neue-haas-grotesk);
+    font-weight: 300;
+    font-style: normal;
+  }
+
+  .font-neue-haas-light {
+    font-family: var(--font-neue-haas-grotesk);
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  .font-neue-haas-medium {
+    font-family: var(--font-neue-haas-grotesk);
+    font-weight: 600;
+    font-style: normal;
+  }
+
+  .font-neue-haas-bold {
+    font-family: var(--font-neue-haas-grotesk);
+    font-weight: 700;
+    font-style: normal;
+  }
+
+  .font-neue-haas-black {
+    font-family: var(--font-neue-haas-grotesk);
+    font-weight: 800;
+    font-style: normal;
+  }
+
+  /* Keep Cofo Raffine from Adobe Fonts for special emphasis */
+  .font-cofo-raffine {
+    font-family: "cofo-raffine", serif;
+    font-weight: 100;
+    font-style: normal;
+  }
+
+  /* Creative font mixing utilities - updated for new fonts */
+  .font-emphasis {
+    font-family: var(--font-kudryashev-display);
+    font-weight: 700;
+  }
+
+  .font-title {
+    font-family: var(--font-neue-haas-grotesk);
+    font-weight: 600;
+  }
+
+  .font-body {
+    font-family: var(--font-neue-haas-grotesk);
+    font-weight: 400;
+  }
+
+  .font-display-large {
+    font-family: var(--font-kudryashev-display);
+    font-weight: 400;
+  }
+
+  /* Mixed font utilities for creative typography */
+  .mixed-fonts-line {
+    line-height: 1.2;
+  }
+
+  .mixed-fonts-line .emphasis {
+    font-family: var(--font-kudryashev-display);
+    font-weight: 700;
+    font-style: normal;
+  }
+
+  .mixed-fonts-line .title {
+    font-family: var(--font-neue-haas-grotesk);
+    font-weight: 600;
+    font-style: normal;
+  }
+
+  .mixed-fonts-line .body {
+    font-family: var(--font-neue-haas-grotesk);
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  .mixed-fonts-line .cofo {
+    font-family: "cofo-raffine", serif;
+    font-weight: 100;
+    font-style: normal;
+  }
+
+  /* Word-level font mixing - updated */
+  .word-kudryashev {
+    font-family: var(--font-kudryashev-display);
+    font-weight: 400;
+    display: inline;
+  }
+
+  .word-kudryashev-bold {
+    font-family: var(--font-kudryashev-display);
+    font-weight: 700;
+    display: inline;
+  }
+
+  .word-neue-haas {
+    font-family: var(--font-neue-haas-grotesk);
+    font-weight: 400;
+    display: inline;
+  }
+
+  .word-neue-haas-thin {
+    font-family: var(--font-neue-haas-grotesk);
+    font-weight: 300;
+    display: inline;
+  }
+
+  .word-neue-haas-bold {
+    font-family: var(--font-neue-haas-grotesk);
+    font-weight: 700;
+    display: inline;
+  }
+
+  .word-cofo {
+    font-family: "cofo-raffine", serif;
+    font-weight: 100;
+    display: inline;
+  }
+}
