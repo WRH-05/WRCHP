@@ -20,8 +20,6 @@ export function FluidCanvas({ className = '', children }: FluidCanvasProps) {
   useEffect(() => {
     if (!canvasRef.current) return
 
-    console.log('🎬 Initializing FluidCanvas...')
-
     // Initialize fluid simulation
     const simulation = new FluidSimulation(canvasRef.current)
     simulationRef.current = simulation
@@ -30,12 +28,9 @@ export function FluidCanvas({ className = '', children }: FluidCanvasProps) {
     const scene = new Transform()
     sceneRef.current = scene
 
-    console.log('📦 Scene created:', scene)
-
     // Wait for DOM to be ready, then create text meshes
     const initTimeout = setTimeout(() => {
       const textElements = document.querySelectorAll('[data-gl-text]')
-      console.log('📝 Found text elements:', textElements.length)
       
       if (textElements.length > 0) {
         const geometry = new Plane(simulation.gl, {
@@ -52,15 +47,10 @@ export function FluidCanvas({ className = '', children }: FluidCanvasProps) {
               scene,
             })
             textMeshesRef.current.push(textMesh)
-            console.log(`✨ Created TextMesh ${index + 1}:`, element.textContent?.substring(0, 30))
           } catch (error) {
-            console.error('❌ Error creating TextMesh:', error)
+            console.error('Error creating TextMesh:', error)
           }
         })
-
-        console.log('📊 Total meshes in scene:', scene.children?.length || 0)
-      } else {
-        console.warn('⚠️ No [data-gl-text] elements found')
       }
     }, 100)
 
@@ -77,7 +67,6 @@ export function FluidCanvas({ className = '', children }: FluidCanvasProps) {
     }
 
     animate()
-    console.log('▶️ Animation loop started')
 
     // Handle resize
     const handleResize = () => {
@@ -95,7 +84,6 @@ export function FluidCanvas({ className = '', children }: FluidCanvasProps) {
       cancelAnimationFrame(rafRef.current)
       simulation.destroy()
       textMeshesRef.current = []
-      console.log('🛑 FluidCanvas cleanup complete')
     }
   }, [])
 
