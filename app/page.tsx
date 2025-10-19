@@ -1,3 +1,4 @@
+// import { FluidCanvas } from "@/components/fluid-canvas"
 import { Landing } from "@/components/landing"
 import { Hero } from "@/components/hero"
 import { About } from "@/components/about"
@@ -11,17 +12,20 @@ import { Navigation } from "@/components/navigation"
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-background">
-      <Navigation />
-      <Landing />
-      <Hero />
-      <About />
-      <Experience />
-      <Education />
-      <Skills />
-      <Projects />
-      <Languages />
-      <Contact />
-    </main>
+    // Temporarily disabled FluidCanvas
+    // <FluidCanvas>
+      <main className="min-h-screen bg-background">
+        <Navigation />
+        <Landing />
+        <Hero />
+        <About />
+        <Experience />
+        <Education />
+        <Skills />
+        <Projects />
+        <Languages />
+        <Contact />
+      </main>
+    // </FluidCanvas>
   )
 }

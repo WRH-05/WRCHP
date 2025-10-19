@@ -1,22 +1,24 @@
+import { TextMorph } from "@/components/text-morph"
+
 export function Hero() {
   return (
     <section id="hero" className="min-h-screen flex items-center justify-center px-6 lg:px-12 lg:pl-32">
       <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-12 lg:gap-24 items-center">
         <div className="space-y-12">
           <div className="space-y-6">
-            <h1 className="font-neue-haas-medium text-4xl lg:text-6xl text-balance leading-tight">
+            <TextMorph className="font-neue-haas-medium text-4xl lg:text-6xl text-balance leading-tight">
               Wassim Rahim Hachemi
-            </h1>
-            <p className="font-kudryashev-display text-xl lg:text-2xl text-muted-foreground font-normal tracking-wide">
+            </TextMorph>
+            <p className="font-kudryashev-display text-xl lg:text-2xl text-muted-foreground font-normal tracking-wide pointer-events-auto">
               Industrial Electronics Engineering Student & Developer
             </p>
-            <p className="font-neue-haas-grotesk text-base lg:text-lg text-muted-foreground max-w-lg leading-relaxed">
+            <p className="font-neue-haas-grotesk text-base lg:text-lg text-muted-foreground max-w-lg leading-relaxed pointer-events-auto">
               I build accessible, innovative solutions that blend electronics design with robust engineering. My passion
               lies at the intersection of <span className="font-emphasis text-foreground">robotics</span>, <span className="font-emphasis text-foreground">AI/ML</span>, and <span className="font-emphasis text-foreground">backend development</span>.
             </p>
           </div>
 
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 pointer-events-auto">
             <div className="flex gap-8">
               <a
                 href="https://github.com/WRH-05"

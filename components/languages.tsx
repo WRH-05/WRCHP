@@ -1,3 +1,5 @@
+import { TextMorph } from "@/components/text-morph"
+
 export function Languages() {
   const languages = [
     { language: "Arabic", level: "Native" },
@@ -11,10 +13,10 @@ export function Languages() {
       <div className="max-w-4xl mx-auto">
         <div className="grid lg:grid-cols-3 gap-12">
           <div className="lg:col-span-1">
-            <h2 className="text-2xl font-light mb-8">Languages</h2>
+            <TextMorph className="text-2xl font-light mb-8">Languages</TextMorph>
           </div>
 
-          <div className="lg:col-span-2 space-y-4">
+          <div className="lg:col-span-2 space-y-4 pointer-events-auto">
             {languages.map((lang, index) => (
               <div key={index} className="flex justify-between items-center py-2">
                 <span className="font-medium">{lang.language}</span>

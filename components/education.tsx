@@ -1,13 +1,15 @@
+import { TextMorph } from "@/components/text-morph"
+
 export function Education() {
   return (
     <section id="education" className="py-24 px-6 lg:px-12">
       <div className="max-w-4xl mx-auto">
         <div className="grid lg:grid-cols-3 gap-12">
           <div className="lg:col-span-1">
-            <h2 className="text-2xl font-light mb-8">Education</h2>
+            <TextMorph className="text-2xl font-light mb-8">Education</TextMorph>
           </div>
 
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-6 pointer-events-auto">
             <div className="space-y-4">
               <div className="space-y-2">
                 <p className="text-sm text-muted-foreground font-mono">September 2022 — Expected June 2027</p>

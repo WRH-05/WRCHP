@@ -1,3 +1,5 @@
+import { TextMorph } from "@/components/text-morph"
+
 export function Projects() {
   const projects = [
     {
@@ -31,10 +33,10 @@ export function Projects() {
       <div className="max-w-4xl mx-auto">
         <div className="grid lg:grid-cols-3 gap-12">
           <div className="lg:col-span-1">
-            <h2 className="text-2xl font-light mb-8">Projects</h2>
+            <TextMorph className="text-2xl font-light mb-8">Projects</TextMorph>
           </div>
 
-          <div className="lg:col-span-2 space-y-8">
+          <div className="lg:col-span-2 space-y-8 pointer-events-auto">
             {projects.map((project, index) => (
               <div key={index} className="space-y-3 group">
                 <div className="flex items-start justify-between">

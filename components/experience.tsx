@@ -1,3 +1,5 @@
+import { TextMorph } from "@/components/text-morph"
+
 export function Experience() {
   const experiences = [
     {
@@ -29,10 +31,10 @@ export function Experience() {
       <div className="max-w-4xl mx-auto">
         <div className="grid lg:grid-cols-3 gap-12">
           <div className="lg:col-span-1">
-            <h2 className="text-3xl font-display font-light mb-8 tracking-wide">Experience</h2>
+            <TextMorph className="text-3xl font-display font-light mb-8 tracking-wide">Experience</TextMorph>
           </div>
 
-          <div className="lg:col-span-2 space-y-16">
+          <div className="lg:col-span-2 space-y-16 pointer-events-auto">
             {experiences.map((exp, index) => (
               <div key={index} className="space-y-6">
                 <div className="space-y-3">

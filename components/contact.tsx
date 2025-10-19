@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 
+import { TextMorph } from "@/components/text-morph"
+
 export function Contact() {
   const [formData, setFormData] = useState({
     name: "",
@@ -32,9 +34,9 @@ export function Contact() {
       <div className="max-w-4xl mx-auto">
         <div className="grid lg:grid-cols-3 gap-12">
           <div className="lg:col-span-1">
-            <h2 className="text-3xl font-display font-light mb-8 tracking-wide">Contact</h2>
+            <TextMorph className="text-3xl font-display font-light mb-8 tracking-wide">Contact</TextMorph>
 
-            <div className="space-y-6">
+            <div className="space-y-6 pointer-events-auto">
               <div className="space-y-2">
                 <p className="text-xs text-muted-foreground font-mono tracking-[0.2em] uppercase">Email</p>
                 <a
@@ -65,7 +67,7 @@ export function Contact() {
             </div>
           </div>
 
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 pointer-events-auto">
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input name="name" placeholder="Name" value={formData.name} onChange={handleChange} required />
@@ -96,7 +98,7 @@ export function Contact() {
         </div>
       </div>
 
-      <div className="mt-24 pt-8 border-t border-border text-center">
+      <div className="mt-24 pt-8 border-t border-border text-center pointer-events-none">
         <p className="text-xs text-muted-foreground font-mono tracking-[0.2em] uppercase">
           © 2025 Wassim Rahim Hachemi. Built with precision and passion.
         </p>

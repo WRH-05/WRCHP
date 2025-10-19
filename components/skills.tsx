@@ -1,3 +1,5 @@
+import { TextMorph } from "@/components/text-morph"
+
 export function Skills() {
   const skillCategories = [
     {
@@ -37,10 +39,10 @@ export function Skills() {
       <div className="max-w-4xl mx-auto">
         <div className="grid lg:grid-cols-3 gap-12">
           <div className="lg:col-span-1">
-            <h2 className="text-2xl font-light mb-8">Technical Skills</h2>
+            <TextMorph className="text-2xl font-light mb-8">Technical Skills</TextMorph>
           </div>
 
-          <div className="lg:col-span-2 space-y-8">
+          <div className="lg:col-span-2 space-y-8 pointer-events-auto">
             {skillCategories.map((category, index) => (
               <div key={index} className="space-y-3">
                 <h3 className="text-sm font-medium text-primary">{category.title}</h3>

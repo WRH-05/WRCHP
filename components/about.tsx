@@ -1,13 +1,15 @@
+import { TextMorph } from "@/components/text-morph"
+
 export function About() {
   return (
     <section id="about" className="py-24 px-6 lg:px-12 lg:pl-32">
       <div className="max-w-4xl mx-auto">
         <div className="grid lg:grid-cols-3 gap-12">
           <div className="lg:col-span-1">
-            <h2 className="text-3xl font-display font-light mb-8 tracking-wide">About</h2>
+            <TextMorph className="text-3xl font-display font-light mb-8 tracking-wide">About</TextMorph>
           </div>
 
-          <div className="lg:col-span-2 space-y-8">
+          <div className="lg:col-span-2 space-y-8 pointer-events-auto">
             <p className="text-lg leading-relaxed text-muted-foreground font-sans">
               I'm a driven 4th-year Industrial Electronics Engineering student at the University of Science and
               Technology Houari Boumediene (USTHB), with solid experience in electronics design, embedded systems, and
@@ -25,7 +27,7 @@ export function About() {
               that bridge the gap between hardware and software.
             </p>
 
-            <div className="pt-6 border-t border-border">
+            <div className="pt-6 border-t border-border pointer-events-auto">
               <p className="text-sm text-muted-foreground mb-4 font-mono tracking-wider uppercase">Connect</p>
               <div className="flex gap-8">
                 <a
