@@ -1,4 +1,10 @@
+import AutoBind from 'auto-bind'
+import Lenis from 'lenis'
+import debounce from 'lodash/debounce'
 import { Camera, Color, Geometry, Post, Program, Mesh, Renderer, RenderTarget, Vec2 } from 'ogl'
+
+import { Home } from '../scenes/Home'
+import { BREAKPOINT_PHONE } from '../utils/Contants'
 
 import advectionManualFilteringShader from '../shaders/advection-manual-filtering-shader.glsl'
 import advectionShader from '../shaders/advection-shader.glsl'
@@ -6,14 +12,23 @@ import baseVertex from '../shaders/base-vertex.glsl'
 import clearShader from '../shaders/clear-shader.glsl'
 import curlShader from '../shaders/curl-shader.glsl'
 import divergenceShader from '../shaders/divergence-shader.glsl'
-import fragment from '../shaders/fragment.glsl' // Original shader that distorts content
+import fragment from '../shaders/fragment.glsl'
 import gradientSubtractShader from '../shaders/gradient-subtract-shader.glsl'
 import pressureShader from '../shaders/pressure-shader.glsl'
 import splatShader from '../shaders/splat-shader.glsl'
 import vorticityShader from '../shaders/vorticity-shader.glsl'
 
-function getSupportedFormat(gl: WebGL2RenderingContext, internalFormat: number, format: number, type: number): { internalFormat: number; format: number } | null {
+export const renderer = new Renderer({
+  alpha: true,
+  antialias: true,
+  dpr: window.devicePixelRatio,
+})
+
+export const gl = renderer.gl
+
+function getSupportedFormat(gl, internalFormat, format, type) {
   if (!supportRenderTextureFormat(gl, internalFormat, format, type)) {
+    // prettier-ignore
     switch (internalFormat) {
       case gl.R16F: return getSupportedFormat(gl, gl.RG16F, gl.RG, type)
       case gl.RG16F: return getSupportedFormat(gl, gl.RGBA16F, gl.RGBA, type)
@@ -24,7 +39,7 @@ function getSupportedFormat(gl: WebGL2RenderingContext, internalFormat: number, 
   return { internalFormat, format }
 }
 
-function supportRenderTextureFormat(gl: WebGL2RenderingContext, internalFormat: number, format: number, type: number): boolean {
+function supportRenderTextureFormat(gl, internalFormat, format, type) {
   let texture = gl.createTexture()
 
   gl.bindTexture(gl.TEXTURE_2D, texture)
@@ -49,9 +64,22 @@ function supportRenderTextureFormat(gl: WebGL2RenderingContext, internalFormat: 
 }
 
 function createDoubleFBO(
-  gl: any,
-  options: any
+  gl,
+  {
+    width,
+    height,
+    wrapS,
+    wrapT,
+    minFilter = gl.LINEAR,
+    magFilter = minFilter,
+    type,
+    format,
+    internalFormat,
+    depth,
+  } = {},
 ) {
+  const options = { width, height, wrapS, wrapT, minFilter, magFilter, type, format, internalFormat, depth }
+
   const fbo = {
     read: new RenderTarget(gl, options),
     write: new RenderTarget(gl, options),
@@ -75,62 +103,115 @@ let pressureDissipation = 0.8
 let curlStrength = 20
 let radius = 0.3
 
-export class FluidSimulation {
-  renderer: Renderer
-  gl: any
-  camera!: Camera
-  post!: Post
-  pass: any
-  sizes!: Vec2
-  viewport!: Vec2
-  
-  density: any
-  velocity: any
-  pressure: any
-  divergence!: RenderTarget
-  curl!: RenderTarget
-  triangle!: Geometry
-  
-  clearProgram!: Mesh
-  splatProgram!: Mesh
-  advectionProgram!: Mesh
-  divergenceProgram!: Mesh
-  curlProgram!: Mesh
-  vorticityProgram!: Mesh
-  pressureProgram!: Mesh
-  gradientSubtractProgram!: Mesh
-  
-  splats: Array<{ x: number; y: number; dx: number; dy: number }>
-  lastMouse: Vec2
-  isKonami: boolean
-  konamiCodePosition: number
+const texelSize = {
+  value: new Vec2(1 / SIMULATION_RESOLUTION),
+}
 
-  constructor(canvas: HTMLCanvasElement) {
-    this.renderer = new Renderer({
-      alpha: true,
-      antialias: true,
-      dpr: window.devicePixelRatio, // Use full device pixel ratio like original
-      canvas
-    })
+// Get supported formats and types for FBOs
+const supportLinearFiltering = gl.renderer.extensions[`OES_texture_${gl.renderer.isWebgl2 ? `` : `half_`}float_linear`]
+const halfFloat = gl.renderer.isWebgl2 ? gl.HALF_FLOAT : gl.renderer.extensions['OES_texture_half_float'].HALF_FLOAT_OES
+const filtering = supportLinearFiltering ? gl.LINEAR : gl.NEAREST
 
-    this.gl = this.renderer.gl
-    this.splats = []
-    this.lastMouse = new Vec2()
-    this.isKonami = false
-    this.konamiCodePosition = 0
+let rgba, rg, r
 
+if (gl.renderer.isWebgl2) {
+  rgba = getSupportedFormat(gl, gl.RGBA16F, gl.RGBA, halfFloat)
+  rg = getSupportedFormat(gl, gl.RG16F, gl.RG, halfFloat)
+  r = getSupportedFormat(gl, gl.R16F, gl.RED, halfFloat)
+} else {
+  rgba = getSupportedFormat(gl, gl.RGBA, gl.RGBA, halfFloat)
+  rg = rgba
+  r = rgba
+}
+
+gl.renderer.getExtension('OES_standard_derivatives')
+
+const lastMouse = new Vec2()
+
+const KEYS = {
+  37: 'left',
+  38: 'up',
+  39: 'right',
+  40: 'down',
+  65: 'a',
+  66: 'b',
+}
+
+const KONAMI = ['up', 'up', 'down', 'down', 'left', 'right', 'left', 'right', 'b', 'a']
+
+export class Canvas {
+  constructor() {
+    AutoBind(this)
+
+    this.createScroll()
+    this.createRenderer()
     this.createCamera()
     this.createPost()
     this.createMouseFluid()
 
-    this.onResize()
-    this.setupEventListeners()
+    this.createScene()
+
+    this.onResize({
+      height: window.innerHeight,
+      width: window.innerWidth,
+    })
+
+    this.onResize = debounce(this.onResize.bind(this), 400)
+
+    window.addEventListener('resize', this.onResize)
+
+    this.onLoop()
+
+    this.isKonami = false
+    this.konamiCodePosition = 0
+
+    document.addEventListener('keydown', this.onKeydown.bind(this))
   }
 
-  createCamera() {
-    this.camera = new Camera(this.gl)
-    this.camera.fov = 45
-    this.camera.position.z = 2
+  onKeydown({ keyCode }) {
+    const key = KEYS[keyCode]
+    const requiredKey = KONAMI[this.konamiCodePosition]
+
+    // compare the key with the required key
+    if (key == requiredKey) {
+      // move to the next key in the konami code sequence
+      this.konamiCodePosition++
+
+      // if the last key is reached, activate cheats
+      if (this.konamiCodePosition == KONAMI.length) {
+        this.activateCheats()
+
+        this.konamiCodePosition = 0
+      }
+    } else {
+      this.konamiCodePosition = 0
+    }
+  }
+
+  activateCheats() {
+    if (this.isKonami) {
+      densityDissipation = 0.93
+    } else {
+      densityDissipation = 0.99
+    }
+
+    this.isKonami = !this.isKonami
+  }
+
+  createScroll() {
+    this.lenis = new Lenis({
+      content: document.body,
+      wrapper: document.body,
+    })
+  }
+
+  createRenderer() {
+    this.renderer = renderer
+
+    this.gl = renderer.gl
+    this.gl.canvas.classList.add('canvas')
+
+    document.body.appendChild(this.gl.canvas)
   }
 
   createPost() {
@@ -146,26 +227,6 @@ export class FluidSimulation {
   }
 
   createMouseFluid() {
-    const supportLinearFiltering = this.gl.renderer.extensions[`OES_texture_${this.gl.renderer.isWebgl2 ? `` : `half_`}float_linear`]
-    const halfFloat = this.gl.renderer.isWebgl2 ? this.gl.HALF_FLOAT : this.gl.renderer.extensions['OES_texture_half_float'].HALF_FLOAT_OES
-    const filtering = supportLinearFiltering ? this.gl.LINEAR : this.gl.NEAREST
-
-    let rgba, rg, r
-
-    if (this.gl.renderer.isWebgl2) {
-      rgba = getSupportedFormat(this.gl, this.gl.RGBA16F, this.gl.RGBA, halfFloat)
-      rg = getSupportedFormat(this.gl, this.gl.RG16F, this.gl.RG, halfFloat)
-      r = getSupportedFormat(this.gl, this.gl.R16F, this.gl.RED, halfFloat)
-    } else {
-      rgba = getSupportedFormat(this.gl, this.gl.RGBA, this.gl.RGBA, halfFloat)
-      rg = rgba
-      r = rgba
-    }
-
-    this.gl.renderer.getExtension('OES_standard_derivatives')
-
-    const texelSize = { value: new Vec2(1 / SIMULATION_RESOLUTION) }
-
     // Create fluid simulation FBOs
     this.density = createDoubleFBO(this.gl, {
       width: DYE_RESOLUTION,
@@ -193,7 +254,7 @@ export class FluidSimulation {
       type: halfFloat,
       format: r?.format,
       internalFormat: r?.internalFormat,
-      minFilter: this.gl.NEAREST,
+      minFilter: gl.NEAREST,
       depth: false,
     })
 
@@ -203,7 +264,7 @@ export class FluidSimulation {
       type: halfFloat,
       format: r?.format,
       internalFormat: r?.internalFormat,
-      minFilter: this.gl.NEAREST,
+      minFilter: gl.NEAREST,
       depth: false,
     })
 
@@ -213,7 +274,7 @@ export class FluidSimulation {
       type: halfFloat,
       format: r?.format,
       internalFormat: r?.internalFormat,
-      minFilter: this.gl.NEAREST,
+      minFilter: gl.NEAREST,
       depth: false,
     })
 
@@ -349,54 +410,69 @@ export class FluidSimulation {
         depthWrite: false,
       }),
     })
+
+    this.splats = []
+
+    // Create handlers to get mouse position and velocity
+    window.addEventListener('touchstart', this.updateMouse, false)
+    window.addEventListener('touchmove', this.updateMouse, false)
+    window.addEventListener('mousemove', this.updateMouse, false)
   }
 
-  setupEventListeners() {
-    window.addEventListener('touchstart', this.updateMouse.bind(this), false)
-    window.addEventListener('touchmove', this.updateMouse.bind(this), false)
-    window.addEventListener('mousemove', this.updateMouse.bind(this), false)
+  createCamera() {
+    this.camera = new Camera(this.gl)
+    this.camera.fov = 45
+    this.camera.position.z = 2
   }
 
-  updateMouse(e: MouseEvent | TouchEvent) {
-    let x: number, y: number
+  createScene() {
+    this.scene = new Home({
+      canvas: this,
+    })
+  }
 
-    if ('changedTouches' in e && e.changedTouches && e.changedTouches.length) {
-      x = e.changedTouches[0].pageX
-      y = e.changedTouches[0].pageY
-    } else if ('pageX' in e) {
-      x = e.pageX
-      y = e.pageY
-    } else {
-      return
+  updateMouse(e) {
+    if (e.changedTouches && e.changedTouches.length) {
+      e.x = e.changedTouches[0].pageX
+      e.y = e.changedTouches[0].pageY
+    }
+    if (e.x === undefined) {
+      e.x = e.pageX
+      e.y = e.pageY
     }
 
-    if (!this.lastMouse.x && !this.lastMouse.y) {
-      this.lastMouse.set(x, y)
-      return
+    if (!lastMouse.isInit) {
+      lastMouse.isInit = true
+
+      // First input
+      lastMouse.set(e.x, e.y)
     }
 
-    const deltaX = x - this.lastMouse.x
-    const deltaY = y - this.lastMouse.y
+    const deltaX = e.x - lastMouse.x
+    const deltaY = e.y - lastMouse.y
 
-    this.lastMouse.set(x, y)
+    lastMouse.set(e.x, e.y)
 
+    // Add if the mouse is moving
     if (Math.abs(deltaX) || Math.abs(deltaY)) {
       this.splats.push({
-        x: x / this.gl.renderer.width,
-        y: 1 - y / this.gl.renderer.height,
+        // Get mouse value in 0 to 1 range, with y flipped
+        x: e.x / gl.renderer.width,
+        y: 1 - e.y / gl.renderer.height,
         dx: deltaX * 5,
         dy: deltaY * -5,
       })
     }
   }
 
-  splat({ x, y, dx, dy }: { x: number; y: number; dx: number; dy: number }) {
+  // Function to draw number of interactions onto input render target
+  splat({ x, y, dx, dy }) {
     this.splatProgram.program.uniforms.uTarget.value = this.velocity.read.texture
-    this.splatProgram.program.uniforms.aspectRatio.value = this.gl.renderer.width / this.gl.renderer.height
+    this.splatProgram.program.uniforms.aspectRatio.value = gl.renderer.width / gl.renderer.height
     this.splatProgram.program.uniforms.point.value.set(x, y)
     this.splatProgram.program.uniforms.color.value.set(dx, dy, 1)
 
-    this.gl.renderer.render({
+    gl.renderer.render({
       scene: this.splatProgram,
       target: this.velocity.write,
       sort: false,
@@ -407,7 +483,7 @@ export class FluidSimulation {
 
     this.splatProgram.program.uniforms.uTarget.value = this.density.read.texture
 
-    this.gl.renderer.render({
+    gl.renderer.render({
       scene: this.splatProgram,
       target: this.density.write,
       sort: false,
@@ -417,7 +493,18 @@ export class FluidSimulation {
     this.density.swap()
   }
 
-  update(scene?: any) {
+  //
+  // Events.
+  //
+  onLoop(now) {
+    this.lenis?.raf(now)
+
+    if (window.innerWidth <= BREAKPOINT_PHONE) {
+      return window.requestAnimationFrame(this.onLoop.bind(this))
+    }
+
+    // Perform all of the fluid simulation renders
+    // No need to clear during sim, saving a number of GL calls.
     this.renderer.autoClear = false
 
     // Render all of the inputs since last frame
@@ -426,55 +513,115 @@ export class FluidSimulation {
     }
 
     this.curlProgram.program.uniforms.uVelocity.value = this.velocity.read.texture
-    this.renderer.render({ scene: this.curlProgram, target: this.curl, sort: false, update: false })
+
+    this.renderer.render({
+      scene: this.curlProgram,
+      target: this.curl,
+      sort: false,
+      update: false,
+    })
 
     this.vorticityProgram.program.uniforms.uVelocity.value = this.velocity.read.texture
     this.vorticityProgram.program.uniforms.uCurl.value = this.curl.texture
-    this.renderer.render({ scene: this.vorticityProgram, target: this.velocity.write, sort: false, update: false })
+
+    this.renderer.render({
+      scene: this.vorticityProgram,
+      target: this.velocity.write,
+      sort: false,
+      update: false,
+    })
+
     this.velocity.swap()
 
     this.divergenceProgram.program.uniforms.uVelocity.value = this.velocity.read.texture
-    this.renderer.render({ scene: this.divergenceProgram, target: this.divergence, sort: false, update: false })
+
+    this.renderer.render({
+      scene: this.divergenceProgram,
+      target: this.divergence,
+      sort: false,
+      update: false,
+    })
 
     this.clearProgram.program.uniforms.uTexture.value = this.pressure.read.texture
-    this.renderer.render({ scene: this.clearProgram, target: this.pressure.write, sort: false, update: false })
+
+    this.renderer.render({
+      scene: this.clearProgram,
+      target: this.pressure.write,
+      sort: false,
+      update: false,
+    })
+
     this.pressure.swap()
 
     this.pressureProgram.program.uniforms.uDivergence.value = this.divergence.texture
 
     for (let i = 0; i < ITERATIONS; i++) {
       this.pressureProgram.program.uniforms.uPressure.value = this.pressure.read.texture
-      this.renderer.render({ scene: this.pressureProgram, target: this.pressure.write, sort: false, update: false })
+
+      this.renderer.render({
+        scene: this.pressureProgram,
+        target: this.pressure.write,
+        sort: false,
+        update: false,
+      })
+
       this.pressure.swap()
     }
 
     this.gradientSubtractProgram.program.uniforms.uPressure.value = this.pressure.read.texture
     this.gradientSubtractProgram.program.uniforms.uVelocity.value = this.velocity.read.texture
-    this.renderer.render({ scene: this.gradientSubtractProgram, target: this.velocity.write, sort: false, update: false })
+
+    this.renderer.render({
+      scene: this.gradientSubtractProgram,
+      target: this.velocity.write,
+      sort: false,
+      update: false,
+    })
+
     this.velocity.swap()
 
     this.advectionProgram.program.uniforms.dyeTexelSize.value.set(1 / SIMULATION_RESOLUTION)
     this.advectionProgram.program.uniforms.uVelocity.value = this.velocity.read.texture
     this.advectionProgram.program.uniforms.uSource.value = this.velocity.read.texture
     this.advectionProgram.program.uniforms.dissipation.value = velocityDissipation
-    this.renderer.render({ scene: this.advectionProgram, target: this.velocity.write, sort: false, update: false })
+
+    this.renderer.render({
+      scene: this.advectionProgram,
+      target: this.velocity.write,
+      sort: false,
+      update: false,
+    })
+
     this.velocity.swap()
 
     this.advectionProgram.program.uniforms.dyeTexelSize.value.set(1 / DYE_RESOLUTION)
     this.advectionProgram.program.uniforms.uVelocity.value = this.velocity.read.texture
     this.advectionProgram.program.uniforms.uSource.value = this.density.read.texture
     this.advectionProgram.program.uniforms.dissipation.value = densityDissipation
-    this.renderer.render({ scene: this.advectionProgram, target: this.density.write, sort: false, update: false })
+
+    this.renderer.render({
+      scene: this.advectionProgram,
+      target: this.density.write,
+      sort: false,
+      update: false,
+    })
+
     this.density.swap()
 
+    // Set clear back to default
     this.renderer.autoClear = true
 
     // Update post pass uniform with the simulation output
     this.pass.uniforms.tFluid.value = this.density.read.texture
 
-    // Post.render() automatically renders the scene to tMap texture
-    // and then applies the post-processing shader with both tMap and tFluid
-    this.post.render({ camera: this.camera, scene })
+    this.post.render({
+      camera: this.camera,
+      scene: this.scene,
+    })
+
+    this.scene.onLoop(this.lenis.scroll)
+
+    window.requestAnimationFrame(this.onLoop.bind(this))
   }
 
   onResize() {
@@ -494,11 +641,7 @@ export class FluidSimulation {
     this.viewport = new Vec2(width, height)
 
     this.post.resize()
-  }
 
-  destroy() {
-    window.removeEventListener('touchstart', this.updateMouse.bind(this))
-    window.removeEventListener('touchmove', this.updateMouse.bind(this))
-    window.removeEventListener('mousemove', this.updateMouse.bind(this))
+    this.scene.onResize()
   }
 }
