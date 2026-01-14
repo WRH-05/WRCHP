@@ -86,8 +86,8 @@ export default function TestBackgrounds() {
         </button>
       </div>
 
-      {/* Fluid Canvas with Text */}
-      <FluidCanvas>
+      {/* Fluid Canvas with Text - use low chromatic on white, higher on dark */}
+      <FluidCanvas chromaticStrength={activeBackground === 'white' ? 0 : activeBackground === 'black' ? 1 : 0.3}>
         <div className="min-h-screen flex flex-col items-center justify-center pointer-events-auto">
           <TextMorph className={`text-9xl font-bold text-center ${current.textClass}`}>
             {current.title}

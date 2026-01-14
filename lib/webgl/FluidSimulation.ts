@@ -6,7 +6,7 @@ import baseVertex from '../shaders/base-vertex.glsl'
 import clearShader from '../shaders/clear-shader.glsl'
 import curlShader from '../shaders/curl-shader.glsl'
 import divergenceShader from '../shaders/divergence-shader.glsl'
-import fragment from '../shaders/fragment.glsl' // Original shader that distorts content
+import fragmentAdaptive from '../shaders/fragment-adaptive.glsl'
 import gradientSubtractShader from '../shaders/gradient-subtract-shader.glsl'
 import pressureShader from '../shaders/pressure-shader.glsl'
 import splatShader from '../shaders/splat-shader.glsl'
@@ -75,6 +75,11 @@ let pressureDissipation = 0.8
 let curlStrength = 20
 let radius = 0.3
 
+export interface FluidSimulationOptions {
+  /** Chromatic aberration strength: 0 = none (good for white), 1 = full (good for dark). Default: 0.3 */
+  chromaticStrength?: number
+}
+
 export class FluidSimulation {
   renderer: Renderer
   gl: any
@@ -102,10 +107,16 @@ export class FluidSimulation {
   
   splats: Array<{ x: number; y: number; dx: number; dy: number }>
   lastMouse: Vec2
-  isKonami: boolean
-  konamiCodePosition: number
+  
+  // Configurable chromatic aberration strength
+  chromaticStrength: number
+  
+  // Bound event handlers for proper cleanup
+  private boundUpdateMouse: (e: MouseEvent | TouchEvent) => void
 
-  constructor(canvas: HTMLCanvasElement) {
+  constructor(canvas: HTMLCanvasElement, options: FluidSimulationOptions = {}) {
+    this.chromaticStrength = options.chromaticStrength ?? 0.3 // Subtle default, works on both light/dark
+    
     this.renderer = new Renderer({
       alpha: true,
       antialias: true,
@@ -116,8 +127,9 @@ export class FluidSimulation {
     this.gl = this.renderer.gl
     this.splats = []
     this.lastMouse = new Vec2()
-    this.isKonami = false
-    this.konamiCodePosition = 0
+    
+    // Bind event handler once for proper cleanup
+    this.boundUpdateMouse = this.updateMouse.bind(this)
 
     this.createCamera()
     this.createPost()
@@ -137,12 +149,21 @@ export class FluidSimulation {
     this.post = new Post(this.gl)
 
     this.pass = this.post.addPass({
-      fragment,
+      fragment: fragmentAdaptive,
       uniforms: {
         tFluid: { value: null },
         uTime: { value: 0 },
+        uChromaticStrength: { value: this.chromaticStrength },
       },
     })
+  }
+  
+  /** Update chromatic aberration strength at runtime (0 = none, 1 = full) */
+  setChromaticStrength(strength: number) {
+    this.chromaticStrength = Math.max(0, Math.min(1, strength))
+    if (this.pass) {
+      this.pass.uniforms.uChromaticStrength.value = this.chromaticStrength
+    }
   }
 
   createMouseFluid() {
@@ -352,9 +373,9 @@ export class FluidSimulation {
   }
 
   setupEventListeners() {
-    window.addEventListener('touchstart', this.updateMouse.bind(this), false)
-    window.addEventListener('touchmove', this.updateMouse.bind(this), false)
-    window.addEventListener('mousemove', this.updateMouse.bind(this), false)
+    window.addEventListener('touchstart', this.boundUpdateMouse, false)
+    window.addEventListener('touchmove', this.boundUpdateMouse, false)
+    window.addEventListener('mousemove', this.boundUpdateMouse, false)
   }
 
   updateMouse(e: MouseEvent | TouchEvent) {
@@ -497,8 +518,11 @@ export class FluidSimulation {
   }
 
   destroy() {
-    window.removeEventListener('touchstart', this.updateMouse.bind(this))
-    window.removeEventListener('touchmove', this.updateMouse.bind(this))
-    window.removeEventListener('mousemove', this.updateMouse.bind(this))
+    window.removeEventListener('touchstart', this.boundUpdateMouse)
+    window.removeEventListener('touchmove', this.boundUpdateMouse)
+    window.removeEventListener('mousemove', this.boundUpdateMouse)
+    
+    // Clean up WebGL resources
+    this.renderer.gl.getExtension('WEBGL_lose_context')?.loseContext()
   }
 }

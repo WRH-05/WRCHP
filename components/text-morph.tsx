@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useRef } from 'react'
 
 interface TextMorphProps {
   children: React.ReactNode
@@ -9,17 +9,6 @@ interface TextMorphProps {
 
 export function TextMorph({ children, className = '' }: TextMorphProps) {
   const elementRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (!elementRef.current) return
-
-    // Add data attribute for WebGL text rendering
-    elementRef.current.setAttribute('data-gl-text', '')
-    
-    return () => {
-      elementRef.current?.removeAttribute('data-gl-text')
-    }
-  }, [])
 
   return (
     <div ref={elementRef} className={className} data-gl-text="">

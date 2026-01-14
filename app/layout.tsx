@@ -6,6 +6,7 @@ import { Noto_Serif_JP } from "next/font/google"
 import localFont from "next/font/local"
 import { Analytics } from "@vercel/analytics/next"
 import { Suspense } from "react"
+import { siteConfig } from "@/lib/config"
 import "./globals.css"
 
 const inter = Inter({
@@ -130,10 +131,8 @@ const neueHaasGrotesk = localFont({
 })
 
 export const metadata: Metadata = {
-  title: "CHROME - Wassim Rahim Hachemi",
-  description:
-    "Industrial Electronics Engineering Student & Developer - Portfolio showcasing electronics, robotics, AI/ML, and backend engineering projects.",
-  generator: "v0.app",
+  title: siteConfig.meta.title,
+  description: siteConfig.meta.description,
 }
 
 export default function RootLayout({

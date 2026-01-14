@@ -1,4 +1,5 @@
 import { TextMorph } from "@/components/text-morph"
+import { siteConfig } from "@/lib/config"
 
 export function About() {
   return (
@@ -11,8 +12,7 @@ export function About() {
 
           <div className="lg:col-span-2 space-y-8 pointer-events-auto">
             <p className="text-lg leading-relaxed text-muted-foreground font-sans">
-              I'm a driven 4th-year Industrial Electronics Engineering student at the University of Science and
-              Technology Houari Boumediene (USTHB), with solid experience in electronics design, embedded systems, and
+              I'm a driven {siteConfig.education.year} {siteConfig.education.degree} student at the {siteConfig.education.university}, with solid experience in electronics design, embedded systems, and
               web development.
             </p>
 
@@ -31,7 +31,7 @@ export function About() {
               <p className="text-sm text-muted-foreground mb-4 font-mono tracking-wider uppercase">Connect</p>
               <div className="flex gap-8">
                 <a
-                  href="https://linkedin.com/in/wassimh"
+                  href={siteConfig.social.linkedin.url}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm font-mono tracking-wider text-muted-foreground hover:text-primary transition-colors duration-300 uppercase"
@@ -39,7 +39,7 @@ export function About() {
                   LinkedIn
                 </a>
                 <a
-                  href="https://github.com/WRH-05"
+                  href={siteConfig.social.github.url}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm font-mono tracking-wider text-muted-foreground hover:text-primary transition-colors duration-300 uppercase"

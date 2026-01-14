@@ -1,4 +1,5 @@
 import { TextMorph } from "@/components/text-morph"
+import { siteConfig } from "@/lib/config"
 
 export function Hero() {
   return (
@@ -7,10 +8,10 @@ export function Hero() {
         <div className="space-y-12">
           <div className="space-y-6">
             <TextMorph className="font-neue-haas-medium text-4xl lg:text-6xl text-balance leading-tight">
-              Wassim Rahim Hachemi
+              {siteConfig.name}
             </TextMorph>
             <p className="font-kudryashev-display text-xl lg:text-2xl text-muted-foreground font-normal tracking-wide pointer-events-auto">
-              Industrial Electronics Engineering Student & Developer
+              {siteConfig.role}
             </p>
             <p className="font-neue-haas-grotesk text-base lg:text-lg text-muted-foreground max-w-lg leading-relaxed pointer-events-auto">
               I build accessible, innovative solutions that blend electronics design with robust engineering. My passion
@@ -21,7 +22,7 @@ export function Hero() {
           <div className="flex flex-col gap-4 pointer-events-auto">
             <div className="flex gap-8">
               <a
-                href="https://github.com/WRH-05"
+                href={siteConfig.social.github.url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-sm font-mono tracking-wider text-muted-foreground hover:text-primary transition-colors duration-300 uppercase"
@@ -29,7 +30,7 @@ export function Hero() {
                 GitHub
               </a>
               <a
-                href="https://linkedin.com/in/wassimh"
+                href={siteConfig.social.linkedin.url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-sm font-mono tracking-wider text-muted-foreground hover:text-primary transition-colors duration-300 uppercase"
@@ -38,16 +39,16 @@ export function Hero() {
               </a>
             </div>
             <a
-              href="mailto:wassimhachemi8@gmail.com"
+              href={`mailto:${siteConfig.contact.email}`}
               className="text-sm font-mono tracking-wider text-muted-foreground hover:text-primary transition-colors duration-300 w-fit"
             >
-              wassimhachemi8@gmail.com
+              {siteConfig.contact.email}
             </a>
             <a
-              href="tel:+213551151123"
+              href={`tel:${siteConfig.contact.phoneRaw}`}
               className="text-sm font-mono tracking-wider text-muted-foreground hover:text-primary transition-colors duration-300 w-fit"
             >
-              +213 55 11 51 23
+              {siteConfig.contact.phone}
             </a>
           </div>
         </div>
@@ -69,7 +70,7 @@ export function Hero() {
               </div>
             </div>
             <div className="font-kudryashev-display text-4xl lg:text-6xl font-normal text-primary/30 tracking-wider relative z-10">
-              WRH
+              {siteConfig.shortName}
             </div>
           </div>
         </div>

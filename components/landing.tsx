@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { TextMorph } from "@/components/text-morph"
+import { siteConfig } from "@/lib/config"
 
 export function Landing() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
@@ -31,16 +32,16 @@ export function Landing() {
       {/* Main CHROME text */}
       <div className="relative z-10 max-w-4xl">
         <TextMorph className="font-kudryashev-extra-contrast text-6xl sm:text-8xl lg:text-9xl xl:text-[12rem] 2xl:text-[14rem] leading-none text-foreground tracking-tight select-none">
-          CHROME
+          {siteConfig.title}
         </TextMorph>
         
         {/* Subtle tagline */}
         <div className="mt-6 lg:mt-12 pointer-events-auto">
           <p className="font-neue-haas-thin text-base sm:text-lg lg:text-xl text-muted-foreground tracking-wide">
-            Industrial Electronics Engineer
+            {siteConfig.education.degree.replace(" Engineering", " Engineer")}
           </p>
           <p className="font-neue-haas-thin text-sm lg:text-base text-muted-foreground/70 mt-2">
-            Building the future through innovation
+            {siteConfig.tagline}
           </p>
         </div>
 
