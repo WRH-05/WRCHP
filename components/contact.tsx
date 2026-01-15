@@ -6,8 +6,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-
-import { TextMorph } from "@/components/text-morph"
+import { siteConfig } from "@/lib/config"
 
 export function Contact() {
   const [formData, setFormData] = useState({
@@ -34,40 +33,62 @@ export function Contact() {
       <div className="max-w-4xl mx-auto">
         <div className="grid lg:grid-cols-3 gap-12">
           <div className="lg:col-span-1">
-            <TextMorph className="text-3xl font-display font-light mb-8 tracking-wide">Contact</TextMorph>
+            <h2 className="text-3xl font-title-light mb-8 tracking-wide">Contact</h2>
 
-            <div className="space-y-6 pointer-events-auto">
+            <div className="space-y-6">
               <div className="space-y-2">
                 <p className="text-xs text-muted-foreground font-mono tracking-[0.2em] uppercase">Email</p>
                 <a
-                  href="mailto:wassimhachemi8@gmail.com"
-                  className="text-muted-foreground hover:text-primary transition-colors duration-300 font-sans"
+                  href={`mailto:${siteConfig.contact.email}`}
+                  className="link-accent font-body"
                 >
-                  wassimhachemi8@gmail.com
+                  {siteConfig.contact.email}
                 </a>
               </div>
 
               <div className="space-y-2">
                 <p className="text-xs text-muted-foreground font-mono tracking-[0.2em] uppercase">Phone</p>
                 <a
-                  href="tel:+213551151123"
-                  className="text-muted-foreground hover:text-primary transition-colors duration-300 font-sans"
+                  href={`tel:${siteConfig.contact.phoneRaw}`}
+                  className="link-accent font-body"
                 >
-                  +213 55 11 51 23
+                  {siteConfig.contact.phone}
                 </a>
               </div>
 
               <div className="space-y-2">
                 <p className="text-xs text-muted-foreground font-mono tracking-[0.2em] uppercase">Location</p>
-                <div className="text-muted-foreground font-sans">
-                  <p>01 Bd Basta Ali, Bab El Oued</p>
-                  <p>16008 Alger</p>
+                <div className="text-muted-foreground font-body">
+                  <p>{siteConfig.contact.address.street}</p>
+                  <p>{siteConfig.contact.address.city}</p>
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <p className="text-xs text-muted-foreground font-mono tracking-[0.2em] uppercase">Social</p>
+                <div className="flex gap-4">
+                  <a
+                    href={siteConfig.social.github.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="link-accent font-mono text-sm uppercase"
+                  >
+                    GitHub
+                  </a>
+                  <a
+                    href={siteConfig.social.linkedin.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="link-accent font-mono text-sm uppercase"
+                  >
+                    LinkedIn
+                  </a>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="lg:col-span-2 pointer-events-auto">
+          <div className="lg:col-span-2">
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input name="name" placeholder="Name" value={formData.name} onChange={handleChange} required />

@@ -14,6 +14,10 @@ export const siteConfig = {
     email: "wassimhachemi8@gmail.com",
     phone: "+213 55 11 51 23",
     phoneRaw: "+213551151123",
+    address: {
+      street: "01 Bd Basta Ali, Bab El Oued",
+      city: "16008 Alger",
+    },
   },
   
   social: {

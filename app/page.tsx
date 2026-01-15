@@ -1,5 +1,4 @@
-import { FluidCanvas } from "@/components/fluid-canvas"
-import { Landing } from "@/components/landing"
+import { LandingFluid } from "@/components/landing-fluid"
 import { Hero } from "@/components/hero"
 import { About } from "@/components/about"
 import { Experience } from "@/components/experience"
@@ -12,19 +11,19 @@ import { Navigation } from "@/components/navigation"
 
 export default function Home() {
   return (
-    <FluidCanvas>
-      <main className="min-h-screen bg-background">
-        <Navigation />
-        <Landing />
-        <Hero />
-        <About />
-        <Experience />
-        <Education />
-        <Skills />
-        <Projects />
-        <Languages />
-        <Contact />
-      </main>
-    </FluidCanvas>
+    <main className="min-h-screen bg-background">
+      <Navigation />
+      {/* Landing section with isolated fluid effect on black background */}
+      <LandingFluid />
+      {/* Rest of the site without fluid effect */}
+      <Hero />
+      <About />
+      <Experience />
+      <Education />
+      <Skills />
+      <Projects />
+      <Languages />
+      <Contact />
+    </main>
   )
 }

@@ -1,0 +1,5 @@
+- remove all unused components there are so many of them in components/ui especially
+- condense the entire website it takes too much space
+- add the lion coat of arms in the landing section
+- reference these portfolios https://bizar.ro/ and https://www.zeynebnk.com/
+- 
